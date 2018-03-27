@@ -21,7 +21,7 @@ public class MakeRuns
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 	   		String s=br.readLine();
 	   		String delims = ".,;:!\" \t\n";
-	      	for(int i = 0; i<maxSize; i++)
+	      	while(!heap.full() && !(s!=null))
 			{
 				//StringTokenizer st = new StringTokenizer(s,delims);
 				//while(st.hasMoreTokens())
@@ -31,7 +31,7 @@ public class MakeRuns
 	      	  	
 	      	
 	      	System.out.println(heap.size());
-	      	while(heap.Size != heap.maxSize())
+	      	while(heap.size() != heap.maxSize())
 	      	{
 	      	  	System.out.println(heap.poll());
 
@@ -51,9 +51,8 @@ public class MakeRuns
 }
 
 
-class MinHeap 
+class MinHeap extends PriorityQueue<String>
 {
-	PriorityQueue<String> heap;
 	int max;
 	String prev;
 	String[] storage;
@@ -62,15 +61,15 @@ class MinHeap
 	public MinHeap(int i)
 	{
 		max = i;
-		heap = new PriorityQueue<String>();
 		prev = null;
 		storage = new String[max];
 		storageIndex = 0;
 	}
-	
-	public int size()
+
+	public boolean full()
 	{
-		return heap.size();
+		if(this.size() < max) return false;
+		else return true;
 	}
 	
 	public int maxSize()
@@ -82,25 +81,26 @@ class MinHeap
 	//Retreives and removes the head of the heap
 	public String poll()
 	{
-		prev = heap.poll();
+		prev = super.poll();
 		return prev;
 	}
 	
-	public void add(String s)
+	public boolean add(String s)
 	{
 		//item read in < prev and size < max
 		if(prev!=null || s.compareTo(prev) > 0)
 	  	{
-	  		storage[storageIndex].add(s);
+	  		storage[storageIndex] = s;
 	  		storageIndex++;
 	 		max--;
+	 		return false;
 	  	}
 	  	else
 	  	{
 	 		//put in heap
-	 		heap.add(s);
+	 		super.add(s);
+	 		return true;
 	  	}
-		
 	}
 	
 	public int getMax()
