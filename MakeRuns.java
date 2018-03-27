@@ -20,8 +20,8 @@ public class MakeRuns
 	
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 	   		String s=br.readLine();
-	   		String delims = ".,;:!\" \t\n";
-	      	while(!heap.full() && !(s!=null))
+	   		String delims = ".,;:!\" \t\n";	   		
+	      	while(!heap.full() && s!=null)
 			{
 				//StringTokenizer st = new StringTokenizer(s,delims);
 				//while(st.hasMoreTokens())
@@ -31,22 +31,17 @@ public class MakeRuns
 	      	  	
 	      	
 	      	System.out.println(heap.size());
-	      	while(heap.size() != heap.maxSize())
+	      	/*while(heap.size() != heap.maxSize())
 	      	{
 	      	  	System.out.println(heap.poll());
 
 	      	  	System.out.println("");
-	      	}
+	      	}*/
 		}
 	    catch(Exception e)
 	    {
 	    	System.err.println(e.getMessage());
 	    }	
-	}
-	
-	public void make(int i,String filename)
-	{
-		
 	}
 }
 
@@ -72,11 +67,7 @@ class MinHeap extends PriorityQueue<String>
 		else return true;
 	}
 	
-	public int maxSize()
-	{
-		return max;
-	}
-	
+	public int maxSize()	{ return max; }
 	
 	//Retreives and removes the head of the heap
 	public String poll()
@@ -87,25 +78,20 @@ class MinHeap extends PriorityQueue<String>
 	
 	public boolean add(String s)
 	{
-		//item read in < prev and size < max
-		if(prev!=null || s.compareTo(prev) > 0)
-	  	{
-	  		storage[storageIndex] = s;
-	  		storageIndex++;
-	 		max--;
+		if(prev!=null) //Is there a better way than comparing to null every time?
+		{
+			if(s.compareTo(prev) > 0)
+	  		{
+	  			storage[storageIndex] = s;
+	  			storageIndex++;
+	 			max--;
+	 		}	
 	 		return false;
 	  	}
-	  	else
-	  	{
-	 		//put in heap
-	 		super.add(s);
-	 		return true;
-	  	}
-	}
-	
-	public int getMax()
-	{
-		return max;
+ 		//put in heap
+	 	super.add(s);
+	 	return true;
+	  	
 	}
 }
 
