@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.StringTokenizer;
 import java.io.*;
+import java.util.*;
 
 public class MakeRuns
 {
@@ -43,7 +44,7 @@ public class MakeRuns
 	      		{
 	      			while(heap.size() != 0)
 	      			{
-	      				String out = heap.poll();
+	      				String out = heap.retreive();
 			      		writer.write(out);
 			      		writer.newLine();
 			      	  	System.out.println(out);
@@ -51,7 +52,9 @@ public class MakeRuns
 	      			break;
 	      		}
 	      		
-	      		String out = heap.poll();
+
+	      		String out = heap.retreive();
+
 	      		writer.write(out);
 	      		writer.newLine();
 	      	  	System.out.println(out);
@@ -60,10 +63,10 @@ public class MakeRuns
 	      	  	if(heap.maxSize() == 0)
 	      	  	{
 	      	  		System.out.println("End of run");
-	      	  		
 	      	  		writer.write("End of run");
 	      	  		writer.newLine();
 	      	  		heap.resetMax();
+
 	      	  	} 		
 	      	}
 	      	System.out.println("End of run");
@@ -79,13 +82,13 @@ public class MakeRuns
 }
 
 
-class MinHeap extends PriorityQueue<Data>
+class MinHeap extends PriorityQueue<StringNode>
 {
-	int originalMax;
-	int max;
-	String prev;
-	String[] storage;
-	int storageIndex;
+	private int originalMax;
+	private int max;
+	private String prev;
+	private String[] storage;
+	private int storageIndex;
 	
 	public MinHeap(int i)
 	{
@@ -105,63 +108,86 @@ class MinHeap extends PriorityQueue<Data>
 	public void resetMax() 
 	{
 	 	max = originalMax;
-	 	prev = null;
-	 	for(int i = 0; i < max; i++)
+	 	Iterator it = super.iterator();
+	 	StringNode n;
+	 	while(it.hasNext())
 	 	{
-	 		if(storage[i] != null)
-	 		{
-	 			this.add(storage[i]);
-	 		}
-	 		
+	 		n = (StringNode)it.next();
+	 		n.setFlag(false);
 	 	}
+	 	
 	 	storageIndex = 0;
 	}
 	public int maxSize()	{ return max; }
 	
 	//Retreives and removes the head of the heap
-	public String poll()
+	public String retreive()
 	{
-		prev = super.poll();
+
+		prev = super.poll().getValue();
+
 		return prev;
 	}
 	
 	public boolean add(String s)
 	{
-		
-		if(prev!=null) //Is there a better way than comparing to null every time?
+		StringNode sn = new StringNode(s);	
+		if(prev!=null)
 		{
 			if(s.compareTo(prev) < 0)
 	  		{
-	  			storage[storageIndex] = s;
-	  			storageIndex++;
+	  			sn.setFlag(true);
+	  			super.add(sn);
 	 			max--;
 	 			return false;
 	 		}
 	 		
 	  	}
 	  	//put in heap
-	 	super.add(s);
+	 	super.add(sn);
 	 	return true;
 	}
 }
-/*
-class Data implements Comparable<Data> {
-  private final String message;
-  private final int priority;
 
-  public Data(String message, int priority) {
-    this.message = message;
-    this.priority = priority;
-  }
+class StringNode implements Comparable<StringNode>
+{
+	private String value;
+	private boolean flag;
+	
+	public StringNode(String s)
+	{
+		value = s;
+		flag = false;
+	}
+	
+	public int compareTo(StringNode other)
+	{
+		if(other.flag == true && flag == true)
+		{
+			return value.compareTo(other.value);
+		}
+		if(flag == true)
+		{
+			return 1;
+		}
+		if(other.flag == true)
+		{
+			return -1;
+		}
 
-  @Override
-  int compareTo(Data other) {
-    return Integer.valueOf(priority).compareTo(other.priority);
-  }
-
-  // also implement equals() and hashCode()
+		return value.compareTo(other.value);
+	}
+	
+	public String getValue()
+	{
+		return value;
+	}
+	
+	public void setFlag(boolean f)
+	{
+		flag = f;
+	}
 }
-*/
 
 
 
