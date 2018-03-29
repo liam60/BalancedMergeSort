@@ -2,6 +2,7 @@ import java.util.PriorityQueue;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.StringTokenizer;
+import java.io.*;
 
 public class MakeRuns
 {
@@ -17,10 +18,13 @@ public class MakeRuns
 	    	int maxSize = Integer.parseInt(args[0]);
 	    	String filename = args[1];
 			MinHeap heap = new MinHeap(maxSize);
-	
+
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 	   		String s=br.readLine();
-	   		String delims = ".,;:!\" \t\n";	   		
+	   		String delims = ".,;:!\" \t\n";	 
+	   		
+	   		BufferedWriter writer;
+	   		  		
 	      	while(!heap.full() && s!=null)
 			{
 				//StringTokenizer st = new StringTokenizer(s,delims);
@@ -28,15 +32,44 @@ public class MakeRuns
 				heap.add(s);
 				s=br.readLine();
 	      	}
-	      	  	
+	      	
+	      	File file = new File("output.runs");
+	      	writer = new BufferedWriter(new FileWriter(file));
 	      	
 	      	System.out.println(heap.size());
-	      	/*while(heap.size() != heap.maxSize())
+	      	while(true)
 	      	{
-	      	  	System.out.println(heap.poll());
-
-	      	  	System.out.println("");
-	      	}*/
+	      		if(s==null)
+	      		{
+	      			while(heap.size() != 0)
+	      			{
+	      				String out = heap.poll();
+			      		writer.write(out);
+			      		writer.newLine();
+			      	  	System.out.println(out);
+	      			}
+	      			break;
+	      		}
+	      		
+	      		String out = heap.poll();
+	      		writer.write(out);
+	      		writer.newLine();
+	      	  	System.out.println(out);
+	      	  	heap.add(s);
+	      	  	s=br.readLine();
+	      	  	if(heap.maxSize() == 0)
+	      	  	{
+	      	  		System.out.println("End of run");
+	      	  		
+	      	  		writer.write("End of run");
+	      	  		writer.newLine();
+	      	  		heap.resetMax();
+	      	  	} 		
+	      	}
+	      	System.out.println("End of run");
+	      	writer.write("End of run");
+	      	writer.newLine();
+	      	writer.close();
 		}
 	    catch(Exception e)
 	    {
@@ -46,8 +79,9 @@ public class MakeRuns
 }
 
 
-class MinHeap extends PriorityQueue<String>
+class MinHeap extends PriorityQueue<Data>
 {
+	int originalMax;
 	int max;
 	String prev;
 	String[] storage;
@@ -55,6 +89,7 @@ class MinHeap extends PriorityQueue<String>
 	
 	public MinHeap(int i)
 	{
+		originalMax = i;
 		max = i;
 		prev = null;
 		storage = new String[max];
@@ -67,6 +102,20 @@ class MinHeap extends PriorityQueue<String>
 		else return true;
 	}
 	
+	public void resetMax() 
+	{
+	 	max = originalMax;
+	 	prev = null;
+	 	for(int i = 0; i < max; i++)
+	 	{
+	 		if(storage[i] != null)
+	 		{
+	 			this.add(storage[i]);
+	 		}
+	 		
+	 	}
+	 	storageIndex = 0;
+	}
 	public int maxSize()	{ return max; }
 	
 	//Retreives and removes the head of the heap
@@ -78,22 +127,42 @@ class MinHeap extends PriorityQueue<String>
 	
 	public boolean add(String s)
 	{
+		
 		if(prev!=null) //Is there a better way than comparing to null every time?
 		{
-			if(s.compareTo(prev) > 0)
+			if(s.compareTo(prev) < 0)
 	  		{
 	  			storage[storageIndex] = s;
 	  			storageIndex++;
 	 			max--;
-	 		}	
-	 		return false;
+	 			return false;
+	 		}
+	 		
 	  	}
- 		//put in heap
+	  	//put in heap
 	 	super.add(s);
 	 	return true;
-	  	
 	}
 }
+/*
+class Data implements Comparable<Data> {
+  private final String message;
+  private final int priority;
+
+  public Data(String message, int priority) {
+    this.message = message;
+    this.priority = priority;
+  }
+
+  @Override
+  int compareTo(Data other) {
+    return Integer.valueOf(priority).compareTo(other.priority);
+  }
+
+  // also implement equals() and hashCode()
+}
+*/
+
 
 
 
